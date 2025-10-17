@@ -1,0 +1,5 @@
+{
+  "name": "Deep Work Co-Pilot",
+  "description": "An application that simulates an AI co-pilot assisting a Product Manager in developing a strategic recommendation for a new feature, demonstrating a virtuous context loop with learning nudges.",
+  "requestFramePermissions": []
+}
