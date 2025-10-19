@@ -100,6 +100,43 @@ The application is a client-side single-page application (SPA) that interacts wi
 
 #### Data Flow Diagram
 ```mermaid
+---
+config:
+  theme: forest
+  themeVariables:
+    fontSize: 18px
+---
+graph TD
+    PM[👤 Product Manager / Knowledge Worker]
+    subgraph app["Deep Work Co-Pilot"]
+        Journal[📝 Deep Work Journal Plan Tasks + Capture Context]
+        Metrics[📊 Performance Dashboard Focus/Learning/Context Scores]
+        AI[🤖 AI Context Agent Assistant + Delegate Modes]
+        Focus[⏱️ Focus Tools Pomodoro/Music/Relax]
+    end
+    Storage[(💾 Context Storage Goals + Tacit Knowledge)]
+    Gemini[🧠 Google Gemini API AI Intelligence]
+    PM -->|1\. Sets Goals & Captures Context| Journal
+    PM -->|2\. Chats & Delegates Tasks| AI
+    PM -->|3\. Uses Focus Sessions| Focus
+    PM -->|4\. Monitors Progress| Metrics
+    Journal -->|Saves Context| Storage
+    Storage -->|Primes AI with User Context| Gemini
+    Gemini -->|Intelligent Responses| AI
+    AI -->|Generates Learning Nudges| Journal
+    Journal -.->|Completion Data| Metrics
+    Focus -.->|Activity Data| Metrics
+    style PM fill:#A435F0,stroke:#7C1BAB,stroke-width:3px,color:#fff
+    style Journal fill:#FF6D00,stroke:#E65100,stroke-width:2px,color:#fff
+    style AI fill:#A435F0,stroke:#7C1BAB,stroke-width:3px,color:#fff
+    style Gemini fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
+    style Storage fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
+    style Metrics fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    style Focus fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    style app fill:#f5f5f5,stroke:#A435F0,stroke-width:3px
+```
+
+```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px'}}}%%
 graph TD
     subgraph ui["🖥️ User Interface Layer"]
