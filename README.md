@@ -100,13 +100,37 @@ The application is a client-side single-page application (SPA) that interacts wi
 
 #### Data Flow Diagram
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'18px'}}}%%
 graph TD
-    A[User Interface (React)] -->|User Actions| B(App.tsx State Management);
-    B -->|Save Goal/Journal| C[firestoreService.ts];
-    B -->|Send Message| D[@google/genai SDK];
-    C -->|Return Saved Data| B;
-    D -->|Stream AI Response| B;
-    B -->|Update UI| A;
+    subgraph exec["⚡ Execution Flow"]
+        PM[Product<br/>Manager] -->|Sets<br/>Goal| Journal{Deep Work<br/>Journal}
+        Journal -->|Delegates| Agent((Context<br/>Agent<br/>Engine))
+        
+        Agent -->|Pulls| Firestore[(Firestore)]
+        Agent -->|Pulls| Enterprise[(Enterprise<br/>Systems)]
+        Agent -->|Selects| MS_Lib[Micro-Skill<br/>Library]
+        
+        MS_Lib -->|Injects| Agent
+        Agent -->|Output| PM
+    end
+    
+    subgraph loop["🔄 Virtuous Loop"]
+        Firestore -.->|Data| Platform[Udemy<br/>Business]
+        Platform -.->|Demand| Instructor[Instructor<br/>Ecosystem]
+        Instructor -.->|Creates| MS_Lib
+    end
+    
+    style PM fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
+    style Agent fill:#A435F0,stroke:#7C1BAB,stroke-width:4px,color:#fff
+    style MS_Lib fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    style Journal fill:#FF6D00,stroke:#E65100,stroke-width:2px,color:#fff
+    style Firestore fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
+    style Enterprise fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
+    style Platform fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
+    style Instructor fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    
+    style exec fill:#f5f5f5,stroke:#A435F0,stroke-width:2px
+    style loop fill:#f5f5f5,stroke:#EC5252,stroke-width:2px
 ```
 
 ### The Virtuous Context Loop
