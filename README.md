@@ -100,37 +100,106 @@ The application is a client-side single-page application (SPA) that interacts wi
 
 #### Data Flow Diagram
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'18px'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px'}}}%%
 graph TD
-    subgraph exec["⚡ Execution Flow"]
-        PM[Product<br/>Manager] -->|Sets<br/>Goal| Journal{Deep Work<br/>Journal}
-        Journal -->|Delegates| Agent((Context<br/>Agent<br/>Engine))
-        
-        Agent -->|Pulls| Firestore[(Firestore)]
-        Agent -->|Pulls| Enterprise[(Enterprise<br/>Systems)]
-        Agent -->|Selects| MS_Lib[Micro-Skill<br/>Library]
-        
-        MS_Lib -->|Injects| Agent
-        Agent -->|Output| PM
+    subgraph ui["🖥️ User Interface Layer"]
+        PM[Product Manager/<br/>Knowledge Worker]
+        Header[Header Scores:<br/>Focus/Learning/Context]
+        Journal[Deep Work Journal:<br/>Daily Plan + Tasks]
+        FocusTools[Focus Tools:<br/>Pomodoro/Music/Relax]
+        Learning[Learning Moments:<br/>Micro-Activities]
     end
     
-    subgraph loop["🔄 Virtuous Loop"]
-        Firestore -.->|Data| Platform[Udemy<br/>Business]
-        Platform -.->|Demand| Instructor[Instructor<br/>Ecosystem]
-        Instructor -.->|Creates| MS_Lib
+    subgraph core["⚡ Core Application Logic"]
+        AppState[App.tsx<br/>State Management]
+        Router[React Router<br/>SPA Navigation]
     end
+    
+    subgraph ai["🤖 AI Co-Pilot Engine"]
+        ChatUI[AI Context Agent UI:<br/>Assistant/Delegate Mode]
+        GeminiAPI[Google Gemini API<br/>gemini-2.5-flash]
+        SystemPrompt[System Instruction<br/>Context Priming]
+        ChatHistory[Chat Session<br/>Conversation Memory]
+    end
+    
+    subgraph data["💾 Data Persistence Layer"]
+        FirestoreService[Firestore Service<br/>In-Memory Store]
+        GoalStore[(Goals &<br/>Big Rocks)]
+        JournalStore[(Context Journal<br/>Tacit Knowledge)]
+        TaskStore[(Daily Tasks &<br/>Completions)]
+    end
+    
+    subgraph external["🔗 External Integrations"]
+        Jira[Jira API<br/>Task Links]
+        GoogleDocs[Google Docs<br/>Document Links]
+        Spotify[Spotify Player<br/>Focus Music]
+    end
+    
+    %% User Interactions
+    PM -->|Inputs Daily Plan| Journal
+    PM -->|Captures Context| Journal
+    PM -->|Uses Focus Tools| FocusTools
+    PM -->|Engages Learning| Learning
+    PM -->|Chats with AI| ChatUI
+    
+    %% UI to Core
+    Journal -->|Updates State| AppState
+    FocusTools -->|Updates Metrics| AppState
+    Learning -->|Tracks Completion| AppState
+    ChatUI -->|Manages Sessions| AppState
+    
+    %% Core to Data
+    AppState -->|Persists Goals| FirestoreService
+    AppState -->|Saves Journal| FirestoreService
+    AppState -->|Stores Tasks| FirestoreService
+    
+    FirestoreService -->|Writes| GoalStore
+    FirestoreService -->|Writes| JournalStore
+    FirestoreService -->|Writes| TaskStore
+    
+    %% Data to AI
+    GoalStore -->|Loads Context| SystemPrompt
+    JournalStore -->|Loads Context| SystemPrompt
+    
+    %% AI Flow
+    ChatUI -->|Sends Query| GeminiAPI
+    SystemPrompt -->|Primes AI| GeminiAPI
+    ChatHistory -->|Provides History| GeminiAPI
+    GeminiAPI -->|Returns Response| ChatUI
+    GeminiAPI -->|Generates Nudges| Learning
+    
+    %% External Integration
+    Journal -.->|Links Tasks| Jira
+    Journal -.->|Links Docs| GoogleDocs
+    FocusTools -.->|Plays Music| Spotify
+    
+    %% Metrics Flow
+    AppState -->|Calculates Scores| Header
+    
+    %% Virtuous Loop
+    TaskStore -.->|Completion Data| AppState
+    Learning -.->|Engagement Data| AppState
+    AppState -.->|Improves Context| SystemPrompt
     
     style PM fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
-    style Agent fill:#A435F0,stroke:#7C1BAB,stroke-width:4px,color:#fff
-    style MS_Lib fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    style GeminiAPI fill:#A435F0,stroke:#7C1BAB,stroke-width:3px,color:#fff
+    style ChatUI fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
     style Journal fill:#FF6D00,stroke:#E65100,stroke-width:2px,color:#fff
-    style Firestore fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
-    style Enterprise fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
-    style Platform fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
-    style Instructor fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    style Learning fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    style FocusTools fill:#EC5252,stroke:#C41E3A,stroke-width:2px,color:#fff
+    style AppState fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
+    style FirestoreService fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
+    style GoalStore fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
+    style JournalStore fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
+    style TaskStore fill:#1C1D1F,stroke:#000,stroke-width:2px,color:#fff
+    style SystemPrompt fill:#A435F0,stroke:#7C1BAB,stroke-width:2px,color:#fff
+    style Header fill:#FF6D00,stroke:#E65100,stroke-width:2px,color:#fff
     
-    style exec fill:#f5f5f5,stroke:#A435F0,stroke-width:2px
-    style loop fill:#f5f5f5,stroke:#EC5252,stroke-width:2px
+    style ui fill:#f5f5f5,stroke:#A435F0,stroke-width:2px
+    style core fill:#f5f5f5,stroke:#FF6D00,stroke-width:2px
+    style ai fill:#f5f5f5,stroke:#A435F0,stroke-width:3px
+    style data fill:#f5f5f5,stroke:#1C1D1F,stroke-width:2px
+    style external fill:#f5f5f5,stroke:#EC5252,stroke-width:2px,stroke-dasharray: 5 5
 ```
 
 ### The Virtuous Context Loop
