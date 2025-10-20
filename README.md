@@ -8,11 +8,12 @@ The PM's Deep Work Co-Pilot is an intelligent web application designed to help P
     - [Target Audience](#target-audience)
     - [Core Problem](#core-problem)
     - [Key Features](#key-features)
-2.  [UI/UX Design](#uiux-design)
+2.  [Recent Updates](#recent-updates)
+3.  [UI/UX Design](#uiux-design)
     - [Design Philosophy](#design-philosophy)
     - [Layout](#layout)
     - [Key Components](#key-components)
-3.  [Technical Design & Architecture](#technical-design--architecture)
+4.  [Technical Design & Architecture](#technical-design--architecture)
     - [Tech Stack](#tech-stack)
     - [Project Structure](#project-structure)
     - [System Design](#system-design)
@@ -47,6 +48,17 @@ Modern knowledge workers are constantly bombarded with notifications and context
     -   **Focus Score:** Rates the quality of the daily plan. A high score is achieved with one "big rock" and a minimal number of other tasks.
     -   **Learning Score:** Tracks the completion percentage of the day's learning activities.
     -   **Context Meter:** Fills up as the user provides more information in their journal, visualizing how much context the AI has to work with.
+
+---
+
+## Recent Updates
+
+-   **Enterprise Integration & User Context:**
+    -   **User Profile Context:** You can now set a persistent user profile in the top-left corner. This high-level context (e.g., your role, team, quarterly goals) is prepended to all AI conversations, ensuring the co-pilot always understands your core professional identity.
+    -   **Enterprise Sync (Simulated):** Added functionality to "Sync" tasks from external enterprise tools and a configuration modal for a "Mission Control Plane" (MCP) server, laying the groundwork for deeper integration with systems like Jira and Google Docs.
+-   **Advanced Planning & Focus Tools:**
+    -   **Granular Task Management:** The "Today's Plan" section now supports deleting tasks and explicitly setting one task as your "Big Rock," which sharpens the Focus Score calculation.
+    -   **Integrated Focus Tools:** The Pomodoro timer, relaxation prompts, and Spotify music player are now fully integrated into the main journaling view, allowing you to seamlessly transition from planning to focused execution.
 
 ---
 
