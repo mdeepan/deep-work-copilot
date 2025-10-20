@@ -8,7 +8,8 @@ import {
     ChevronLeftIcon, ChevronRightIcon, WandSparklesIcon, ChatBubbleLeftRightIcon,
     VideoCameraIcon, DocumentTextIcon, UsersIcon, JiraIcon, GDocIcon, LinkIcon,
     PlayIcon, PauseIcon, StopIcon, MoonIcon, SpotifyIcon, BackwardIcon, ForwardIcon, 
-    PlayCircleIcon, PauseCircleIcon, TargetIcon, BrainIcon, FunnelIcon
+    PlayCircleIcon, PauseCircleIcon, TargetIcon, BrainIcon, FunnelIcon, UserCircleIcon,
+    PlusCircleIcon, ArrowPathIcon, Cog6ToothIcon, TrashIcon
 } from './components/icons';
 import { GoogleGenAI, Chat } from '@google/genai';
 
@@ -210,8 +211,15 @@ const DeepWorkJournal: React.FC<{
     setJournal: (j: string) => void;
     onSavePlan: () => void;
     isLoading: boolean;
-}> = ({ currentStep, tasks, setTasks, learningActivities, setLearningActivities, journal, setJournal, onSavePlan, isLoading }) => {
+    onDeleteTask: (id: string) => void;
+    onSetBigRock: (id: string) => void;
+    onOpenMcpModal: () => void;
+}> = ({ 
+    currentStep, tasks, setTasks, learningActivities, setLearningActivities, 
+    journal, setJournal, onSavePlan, isLoading, onDeleteTask, onSetBigRock, onOpenMcpModal
+}) => {
     
+    const [newTaskText, setNewTaskText] = useState("");
     const isPlanEditable = currentStep === FlowStep.GoalInitiation;
     const today = useMemo(() => new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }), []);
     const bigRockTask = useMemo(() => tasks.find(t => t.isBigRock), [tasks]);
@@ -228,6 +236,31 @@ const DeepWorkJournal: React.FC<{
         setLearningActivities(learningActivities.map(a => a.id === id ? { ...a, completed: !a.completed } : a));
     };
 
+    const handleAddTask = (e?: React.FormEvent) => {
+        e?.preventDefault();
+        if (newTaskText.trim()) {
+            const newTask: Task = {
+                id: `task_${Date.now()}`,
+                text: newTaskText.trim(),
+                isBigRock: false,
+                completed: false
+            };
+            setTasks([...tasks, newTask]);
+            setNewTaskText("");
+        }
+    };
+
+    const handleSyncTasks = () => {
+        const syncedTasks: Task[] = [
+            { id: 'task_sync_1', text: "Finalize Q4 budget proposal with finance", isBigRock: false, completed: false, source: { type: 'gdoc', identifier: 'Q4 Budget Draft', link: '#' }},
+            { id: 'task_sync_2', text: "Triage new bug reports from the weekend", isBigRock: false, completed: false, source: { type: 'jira', identifier: 'PROD-BUGS', link: '#' }},
+        ];
+        const existingIds = new Set(tasks.map(t => t.id));
+        const newTasks = syncedTasks.filter(t => !existingIds.has(t.id));
+        setTasks([...tasks, ...newTasks]);
+    };
+
+
     return (
         <div className="flex-1 bg-gray-800 p-8 flex flex-col space-y-6 overflow-y-auto">
             <div className="flex items-center space-x-3 text-gray-400">
@@ -236,27 +269,36 @@ const DeepWorkJournal: React.FC<{
             </div>
             
             <div className="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
-                <div className="flex items-center space-x-3 text-gray-300 mb-4">
-                    <BriefcaseIcon className="w-6 h-6" />
-                    <h2 className="text-xl font-bold">Today's Plan</h2>
+                <div className="flex items-center justify-between text-gray-300 mb-4">
+                    <div className="flex items-center space-x-3">
+                        <BriefcaseIcon className="w-6 h-6" />
+                        <h2 className="text-xl font-bold">Today's Plan</h2>
+                    </div>
+                    {isPlanEditable && (
+                         <div className="flex items-center space-x-3">
+                            <button onClick={handleSyncTasks} className="flex items-center space-x-1.5 text-xs text-gray-400 hover:text-white bg-gray-700/50 px-2 py-1 rounded-md transition-colors" title="Sync tasks from enterprise apps">
+                                <ArrowPathIcon className="w-3.5 h-3.5" />
+                                <span>Sync</span>
+                            </button>
+                            <button onClick={onOpenMcpModal} className="text-xs text-gray-400 hover:text-white bg-gray-700/50 px-2 py-1 rounded-md transition-colors">
+                                MCP
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <div className="space-y-3">
                     {tasks.map(task => (
-                        <div key={task.id} className="flex items-start space-x-3">
+                        <div key={task.id} className="group flex items-start space-x-3">
                             <input type="checkbox" checked={task.completed} onChange={() => toggleTaskCompletion(task.id)} className="mt-1.5 h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-600 focus:ring-indigo-500" />
                             <div className="flex-grow">
-                                {task.isBigRock ? (
-                                    <input
-                                        type="text"
-                                        value={task.text}
-                                        onChange={(e) => handleTaskChange(task.id, e.target.value)}
-                                        className={`w-full bg-transparent text-white font-bold transition-all ${task.completed ? 'line-through text-gray-500' : ''} ${isPlanEditable ? 'border-b border-gray-600 focus:outline-none focus:border-indigo-500' : ''}`}
-                                        placeholder="e.g., Draft strategic pitch for 'Quick Share' feature"
-                                        disabled={!isPlanEditable}
-                                    />
-                                ) : (
-                                    <p className={`text-sm ${task.completed ? 'line-through text-gray-500' : 'text-gray-300'}`}>{task.text}</p>
-                                )}
+                                <input
+                                    type="text"
+                                    value={task.text}
+                                    onChange={(e) => handleTaskChange(task.id, e.target.value)}
+                                    className={`w-full bg-transparent transition-all ${task.completed ? 'line-through text-gray-500' : 'text-white'} ${task.isBigRock ? 'font-bold' : 'text-sm text-gray-300'} ${isPlanEditable ? 'border-b border-transparent focus:outline-none focus:border-indigo-500' : ''}`}
+                                    placeholder={task.isBigRock ? "e.g., Draft strategic pitch for 'Quick Share' feature" : "New Task"}
+                                    disabled={!isPlanEditable}
+                                />
                                 {task.source && (
                                     <a href={task.source.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center space-x-1.5 text-xs text-gray-500 hover:text-indigo-400 mt-1">
                                         {React.createElement(taskSourceIcons[task.source.type], { className: `w-3 h-3 ${task.source.type === 'jira' ? 'text-blue-400' : 'text-blue-500'}` })}
@@ -264,10 +306,33 @@ const DeepWorkJournal: React.FC<{
                                     </a>
                                 )}
                             </div>
-                            {!task.source && <button className="text-gray-600 hover:text-gray-400"><LinkIcon className="w-4 h-4"/></button>}
+                            {isPlanEditable && (
+                                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onClick={() => onSetBigRock(task.id)} title="Set as Big Rock Task">
+                                        <TargetIcon className={`w-5 h-5 ${task.isBigRock ? 'text-indigo-400' : 'text-gray-600 hover:text-indigo-400'}`} />
+                                    </button>
+                                    <button onClick={() => onDeleteTask(task.id)} title="Delete Task">
+                                        <TrashIcon className="w-5 h-5 text-gray-600 hover:text-red-500" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
+                 {isPlanEditable && (
+                    <form onSubmit={handleAddTask} className="mt-4 flex items-center space-x-2 border-t border-gray-700 pt-4">
+                        <input
+                            type="text"
+                            value={newTaskText}
+                            onChange={(e) => setNewTaskText(e.target.value)}
+                            placeholder="Add a new task..."
+                            className="flex-grow bg-gray-700/50 border border-gray-600 rounded-md py-1.5 px-3 text-sm text-white focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                        />
+                        <button type="submit" className="p-1.5 text-gray-400 hover:text-white" title="Add task">
+                            <PlusCircleIcon className="w-6 h-6" />
+                        </button>
+                    </form>
+                )}
             </div>
 
             <div className="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
@@ -374,30 +439,32 @@ const AIContextAgent: React.FC<{
         }
     };
     
-    const generateContextualPrompts = (task: string): string[] => {
+    const generateContextualPrompts = (task: string): {key: string, text: string, prompt: string}[] => {
+        const prompts: {key: string, text: string, prompt: string}[] = [];
+        
         if (currentStep < FlowStep.DeepWorkDelegation) {
-            return [
-                "Help me define a 'big rock' task for today.",
-                "What makes a good daily plan?",
-                "Suggest some productivity techniques."
-            ];
+            prompts.push({ key: 'define-br', text: "Help me define a 'big rock' task for today.", prompt: "Help me define a 'big rock' task for today." });
+            prompts.push({ key: 'good-plan', text: "What makes a good daily plan?", prompt: "What makes a good daily plan?" });
+            return prompts;
         }
 
+        if(task) {
+             prompts.push({ key: 'find-experts', text: "Find experts who can help with my task", prompt: `Find experts in our company who could help with: "${task}"` });
+        }
+       
         const lowerTask = task.toLowerCase();
-        const prompts = new Set<string>();
         if (lowerTask.includes('strategy') || lowerTask.includes('pitch')) {
-            prompts.add("Help me craft an effective strategy");
-            prompts.add("What are common pitfalls in strategy documents?");
+            prompts.push({ key: 'craft-strategy', text: "Help me craft an effective strategy", prompt: "Help me craft an effective strategy" });
+            prompts.push({ key: 'strategy-pitfalls', text: "What are common pitfalls in strategy documents?", prompt: "What are common pitfalls in strategy documents?" });
         }
         if (lowerTask.includes('market') || lowerTask.includes('sizing')) {
-            prompts.add("Explain TAM, SAM, SOM in simple terms");
-            prompts.add("Give me a template for market analysis");
+            prompts.push({ key: 'tam-sam', text: "Explain TAM, SAM, SOM in simple terms", prompt: "Explain TAM, SAM, SOM in simple terms" });
         }
-        if (prompts.size === 0) {
-            prompts.add("Help me break this task down");
-            prompts.add("What's a good first step?");
+        if (prompts.length <= 1) { // Only expert finder was added
+             prompts.push({ key: 'break-down', text: "Help me break this task down", prompt: "Help me break this task down" });
+             prompts.push({ key: 'first-step', text: "What's a good first step?", prompt: "What's a good first step?" });
         }
-        return Array.from(prompts);
+        return prompts;
     }
     const contextualPrompts = useMemo(() => generateContextualPrompts(bigRockTask), [bigRockTask, currentStep]);
 
@@ -455,7 +522,7 @@ const AIContextAgent: React.FC<{
                         <p className="text-sm text-gray-400 mb-4">How can I help you think deeply today?</p>
                         <div className="space-y-2">
                             {contextualPrompts.map(p => (
-                                <button key={p} onClick={() => onSendAssistantMessage(p)} className="w-full text-left text-sm bg-gray-700/50 p-2 rounded-md hover:bg-gray-700 transition-colors">{p}</button>
+                                <button key={p.key} onClick={() => onSendAssistantMessage(p.prompt)} className="w-full text-left text-sm bg-gray-700/50 p-2 rounded-md hover:bg-gray-700 transition-colors">{p.text}</button>
                             ))}
                         </div>
                     </div>
@@ -528,6 +595,77 @@ const AIContextAgent: React.FC<{
 
 
 // =================================================================
+// User Profile Popover Component
+// =================================================================
+const UserProfilePopover: React.FC<{
+    context: string;
+    setContext: (context: string) => void;
+    onClose: () => void;
+}> = ({ context, setContext, onClose }) => {
+    const popoverRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (popoverRef.current && !popoverRef.current.contains(event.target as Node)) {
+                onClose();
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [onClose]);
+
+    return (
+        <div ref={popoverRef} className="absolute top-16 left-4 w-96 bg-gray-800 border border-gray-700 rounded-lg shadow-2xl z-30 p-4 animate-fade-in-up">
+            <h3 className="text-lg font-bold text-white mb-2">My Context</h3>
+            <p className="text-sm text-gray-400 mb-3">This context is automatically prepended to all AI conversations to personalize your experience.</p>
+            <textarea
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                rows={6}
+                className="w-full p-2 bg-gray-700/50 border border-gray-600 rounded-md text-gray-300 text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <button onClick={onClose} className="mt-3 w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-sm">
+                Close
+            </button>
+        </div>
+    );
+};
+
+
+// =================================================================
+// MCP Config Modal Component
+// =================================================================
+const McpConfigModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+    return (
+        <div className="fixed inset-0 bg-black/60 z-40 flex items-center justify-center animate-fade-in">
+            <div className="bg-gray-800 border border-gray-700 rounded-lg shadow-2xl p-6 w-full max-w-md">
+                <h2 className="text-xl font-bold text-white mb-4">MCP Server Configuration</h2>
+                <p className="text-sm text-gray-400 mb-4">Configure the connection to your enterprise MCP server to sync tools and data.</p>
+                <div>
+                    <label htmlFor="mcp-url" className="block text-sm font-medium text-gray-300 mb-2">Server URL</label>
+                    <input
+                        type="text"
+                        id="mcp-url"
+                        placeholder="https://mcp.my-enterprise.com"
+                        className="w-full bg-gray-700/50 border border-gray-600 rounded-md py-2 px-3 text-sm text-white focus:ring-2 focus:ring-indigo-500"
+                    />
+                </div>
+                <div className="mt-6 flex justify-end space-x-3">
+                    <button onClick={onClose} className="bg-gray-600 text-white font-bold py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-sm">
+                        Cancel
+                    </button>
+                    <button onClick={onClose} className="bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-sm">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// =================================================================
 // Main App Component
 // =================================================================
 const App: React.FC = () => {
@@ -550,6 +688,14 @@ const App: React.FC = () => {
     const [learningActivities, setLearningActivities] = useState<LearningActivity[]>([]);
     const [journal, setJournal] = useState<string>("");
     const bigRockTaskText = useMemo(() => tasks.find(t => t.isBigRock)?.text || '', [tasks]);
+
+    // User Profile state
+    const [userProfileContext, setUserProfileContext] = useState<string>(
+        "I am a Product Manager for the 'Creator Tools' team at a large tech company. My primary focus this quarter is on improving user engagement and retention for our video editing features. I value clear, data-driven strategies and concise communication."
+    );
+    const [isProfilePopoverOpen, setIsProfilePopoverOpen] = useState(false);
+    const [isMcpModalOpen, setIsMcpModalOpen] = useState(false);
+
 
     const aiRef = useRef<GoogleGenAI | null>(null);
     if (!aiRef.current) {
@@ -605,12 +751,12 @@ const App: React.FC = () => {
             const genericChat = aiRef.current.chats.create({
               model: 'gemini-2.5-flash',
               config: {
-                systemInstruction: `You are a world-class Product Manager co-pilot. Help the user plan their day and answer general questions about product management.`,
+                systemInstruction: `${userProfileContext}\n\n---END OF PROFILE---\n\nYou are a world-class Product Manager co-pilot. Help the user plan their day and answer general questions about product management.`,
               },
             });
             setChat(genericChat);
         }
-    }, []); // Empty dependency array ensures this runs only once
+    }, [userProfileContext]); 
 
 
     const handleReset = () => {
@@ -624,12 +770,11 @@ const App: React.FC = () => {
         setAgentMode('assistant');
         setIsAssistantThinking(false);
         setAssistantChatHistory([]);
-        // Re-initialize with generic chat context
         if (aiRef.current) {
              const genericChat = aiRef.current.chats.create({
               model: 'gemini-2.5-flash',
               config: {
-                systemInstruction: `You are a world-class Product Manager co-pilot. Help the user plan their day and answer general questions about product management.`,
+                systemInstruction: `${userProfileContext}\n\n---END OF PROFILE---\n\nYou are a world-class Product Manager co-pilot. Help the user plan their day and answer general questions about product management.`,
               },
             });
             setChat(genericChat);
@@ -641,21 +786,20 @@ const App: React.FC = () => {
         await FirestoreService.saveGoal(USER_ID, bigRockTaskText);
         await FirestoreService.saveJournalEntry(USER_ID, journal);
         
-        // Re-initialize chat with specific context now that the plan is locked
         if (aiRef.current) {
              const newChat = aiRef.current.chats.create({
               model: 'gemini-2.5-flash',
               config: {
-                systemInstruction: `You are a world-class Product Manager co-pilot. The user's primary goal for the day (their "Big Rock Task") is: "${bigRockTaskText}". Their private, tacit context is: "${journal}". Your role is to act as an expert sounding board and assistant. Help them think deeply, challenge their assumptions, and provide insightful information related to their task. Be concise, helpful, and format your responses with markdown where appropriate.`,
+                systemInstruction: `${userProfileContext}\n\n---END OF PROFILE---\n\nYou are a world-class Product Manager co-pilot. The user's primary goal for the day (their "Big Rock Task") is: "${bigRockTaskText}". Their private, tacit context is: "${journal}". Your role is to act as an expert sounding board and assistant. Help them think deeply, challenge their assumptions, and provide insightful information related to their task. Be concise, helpful, and format your responses with markdown where appropriate.`,
               },
             });
             setChat(newChat);
-            setAssistantChatHistory([]); // Reset history as context is now new and more specific
+            setAssistantChatHistory([]); 
         }
 
         setCurrentStep(FlowStep.DeepWorkDelegation);
         setIsLoading(false);
-        setAgentMode('delegate'); // Switch to delegate mode after locking plan
+        setAgentMode('delegate');
     };
 
      const handleSendAssistantMessage = async (message: string) => {
@@ -725,13 +869,37 @@ const App: React.FC = () => {
         setIsAgentThinking(false);
     }, [isAgentPanelOpen, agentMode]);
 
+    const handleDeleteTask = (taskId: string) => {
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+    };
+    
+    const handleSetBigRock = (taskId: string) => {
+        setTasks(prevTasks => prevTasks.map(task => ({
+            ...task,
+            isBigRock: task.id === taskId,
+        })));
+    };
+
     return (
         <div className="h-screen bg-gray-900 text-gray-200 flex flex-col font-sans overflow-hidden">
             <header className="relative text-center py-4 border-b border-gray-700 bg-gray-800/80 backdrop-blur-sm z-10 flex-shrink-0">
+                 <div className="absolute top-1/2 -translate-y-1/2 left-4">
+                    <button onClick={() => setIsProfilePopoverOpen(p => !p)} className="p-2 rounded-full hover:bg-gray-700 transition-colors" title="View/Edit User Context">
+                        <UserCircleIcon className="w-7 h-7 text-gray-300" />
+                    </button>
+                </div>
                  <h1 className="text-2xl font-bold text-white">Deep Work Co-Pilot</h1>
                  <HeaderScores focusScore={focusScore} learningScore={learningScore} contextValue={contextValue} />
             </header>
             <main className="flex flex-grow relative overflow-hidden">
+                {isProfilePopoverOpen && (
+                    <UserProfilePopover
+                        context={userProfileContext}
+                        setContext={setUserProfileContext}
+                        onClose={() => setIsProfilePopoverOpen(false)}
+                    />
+                )}
+                 {isMcpModalOpen && <McpConfigModal onClose={() => setIsMcpModalOpen(false)} />}
                <DeepWorkJournal 
                     currentStep={currentStep}
                     tasks={tasks}
@@ -742,6 +910,9 @@ const App: React.FC = () => {
                     setJournal={setJournal}
                     onSavePlan={handleSavePlan}
                     isLoading={isLoading}
+                    onDeleteTask={handleDeleteTask}
+                    onSetBigRock={handleSetBigRock}
+                    onOpenMcpModal={() => setIsMcpModalOpen(true)}
                />
                <div className={`transition-all duration-300 ease-in-out flex-shrink-0 ${isAgentPanelOpen ? 'w-[30rem]' : 'w-0'}`}>
                  <div className="w-[30rem] h-full overflow-hidden">

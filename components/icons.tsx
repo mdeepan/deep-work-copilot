@@ -229,3 +229,34 @@ export const FunnelIcon = ({ className }: { className?: string }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L16 11.414V16a1 1 0 01-.293.707l-2 2A1 1 0 0113 18v-1.586l-1.707-1.707A1 1 0 0111 14v-2.586l-4.707-4.707A1 1 0 016 6V4z" />
     </svg>
 );
+
+export const UserCircleIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+);
+
+export const PlusCircleIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+);
+
+export const ArrowPathIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.483 4.483c3.123-3.123 8.186-3.123 11.309 0s3.123 8.186 0 11.309-8.186 3.123-11.309 0-3.123-8.186 0-11.309zM15 12H9m-2.121 2.121c-1.172-1.172-1.172-3.071 0-4.243s3.071-1.172 4.243 0 1.172 3.071 0 4.243-3.071 1.172-4.243 0z" clipRule="evenodd" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 4.5l-15 15" />
+    </svg>
+);
+
+export const Cog6ToothIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.343 3.94c.09-.542.56-1.007 1.11-1.227l.128-.054a2.25 2.25 0 012.867 2.867l-.054.128c-.22.55-.685 1.02-1.227 1.11a2.25 2.25 0 01-2.867-2.867zM10.343 3.94a2.25 2.25 0 00-2.867 2.867l-.054.128c-.22.55-.685 1.02-1.227 1.11a2.25 2.25 0 002.867 2.867l.128-.054c.55-.22 1.02-.685 1.11-1.227m0 0l-.21.21m-.21-.21a2.25 2.25 0 00-2.656 2.656l.21.21m0 0l-.21 2.1a2.25 2.25 0 002.656 2.656l2.1-.21m0 0l2.1 2.1a2.25 2.25 0 002.656-2.656l-2.1-2.1m0 0a2.25 2.25 0 00-2.656-2.656l-2.1 2.1m-4.243 2.121l1.414-1.414m-1.414 1.414l-1.414-1.414m1.414 1.414l1.414 1.414m-1.414-1.414l-1.414 1.414M19.5 10.5a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+    </svg>
+);
+
+export const TrashIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+    </svg>
+);
